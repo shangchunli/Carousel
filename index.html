@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="css/common.css" />
+		<link rel="stylesheet" href="style.css">
+	</head>
+	<body>
+		<div class="box" id="box"></div>
+	</body>
+	<script src='https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js'></script>
+	<script>
+		function Carousel(list) {
+			var box=$('#box');
+				carouselHtml = ''
+					+ '<div class="slider" id="slider">'
+					+ '<div class="slide"><img src="' + list[0] + '"+ alt=""></div>'
+					+ '<div class="slide"><img src="' + list[1] + '" alt=""></div>'
+					+ '<div class="slide"><img src="' + list[2] + '" alt=""></div>'
+					+ '<div class="slide"><img src="' + list[3] + '" alt=""></div>'
+					+ '<div class="slide"><img src="' + list[4] + '" alt=""></div>'
+					+ '<div class="slide"><img src="' + list[5] + '" alt=""></div>'
+					+ '<div class="slide"><img src="' + list[6] + '" alt=""></div>'
+					+ '</div>'
+					+ '<span id="left"><</span>'
+					+ '<span id="right">></span>'
+					+'<ul class="nav" id="navs"><li>1</li><li>2</li><li>3</li><li>4</li><li>5</li></ul>'
+				timer=null;
+				index=1;
+				isMoving=false;
+			box.html(carouselHtml);
+			// //移上消除轮播
+			box.mouseover(function () {
+				clearInterval(timer);
+				$("#left").css({ opacity: .4 });
+				$("#right").css({ opacity: .4 })
+				
+			})
+			//移出开始轮播
+			box.mouseout(function () {
+				timer = setInterval(next, 1000);
+				$("#left").css({ opacity: 0 });
+				$("#right").css({ opacity: 0 })
+			})
+			//点击右按钮
+			$("#right").click(function () { 
+				next();
+			})
+			//点击左按钮
+			$("#left").click(function () { 
+				pre();
+			})
+			//下一页
+			function next() {
+				if (isMoving) {
+					return;
+				}
+				isMoving = true;
+				index++;
+				navmove();
+				animate(slider, { left: -1200 * (index-1) }, function () {
+					if (index == 6) {
+						slider.style.left = '-1200px';
+						index = 1;
+					}
+					isMoving = false;
+				});
+			}
+			//上一页
+			function pre() {
+				if (isMoving) {
+					return;
+				}
+				isMoving = true;
+				index--;
+				navmove();
+				animate(slider, { left: -1200 * (index-1) }, function () {
+					if (index == -1) {
+						slider.style.left = '-6000px';
+						index = 5;
+					}
+					isMoving = false;
+				});
+			}
+			//数字样式
+			function navmove() {				
+				$(".nav li").eq(index-2).addClass("active");
+				$(".nav li").eq(index-2).siblings().removeClass("active");
+			};
+			//开始轮播			
+			timer = setInterval(next, 1000);
+			
+			function getStyle(obj, attr) {
+				if (obj.currentStyle) {
+					return obj.currentStyle[attr];
+				} else {
+					return getComputedStyle(obj, null)[attr];
+				}
+			}
+			function animate(obj, json, callback) {
+				clearInterval(obj.timer);
+				obj.timer = setInterval(function () {
+					var flag = true;
+					for (var attr in json) {
+						(function (attr) {
+							if (attr == "opacity") {
+								var now = parseInt(getStyle(obj, attr) * 100);
+								var dest = json[attr] * 100;
+							} else {
+								var now = parseInt(getStyle(obj, attr));
+								var dest = json[attr];
+							}
+							var speed = (dest - now) / 6;
+							speed = speed > 0 ? Math.ceil(speed) : Math.floor(speed);
+							if (now != dest) {
+								flag = false;
+								if (attr == "opacity") {
+									obj.style[attr] = (now + speed) / 100;
+								} else {
+									obj.style[attr] = now + speed + "px";
+								}
+							}
+						})(attr);
+					}
+					if (flag) {
+						clearInterval(obj.timer);
+						callback && callback(); //如果回调函数存在，就调用回调函数
+					}
+				}, 30);
+			}
+			
+
+		}
+		var carousel=new Carousel(
+			["img/b5.png", "img/b1.png", "img/b2.png", "img/b3.png", "img/b4.png", "img/b5.png", "img/b1.png"]
+		)
+	</script>
+</html>
